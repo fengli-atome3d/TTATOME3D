@@ -254,7 +254,8 @@
 
         <a
           class="button-link button-link--download"
-          href="https://apps.apple.com/fr/app/tigertag-rfid-connect/id6745437963"
+          href="#"
+          onclick="handleDownload(event)"
           target="_blank"
           rel="noopener noreferrer"
           aria-label="Telecharger Tigertag"
@@ -300,41 +301,45 @@
       }
     }
 
-    function openInStore(event) {
-      const ua = navigator.userAgent || navigator.vendor || window.opera;
-      const isAndroid = /android/i.test(ua);
-      const isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+    function handleDownload(event) {
+        const ua = navigator.userAgent.toLowerCase();
+        const platform = navigator.platform.toLowerCase();
+        const link = event.currentTarget;
 
-      // --- 1. PC / DESKTOP LOGIC ---
-      if (!isAndroid && !isIOS) {
-        // Let the standard target="_blank" handle it on PC
-        return;
-      }
+        // --- 1. MOBILE SYSTEMS ---
+        const isAndroid = /android/i.test(ua);
+        const isIOS = /ipad|iphone|ipod/.test(ua);
 
-      // --- 2. MOBILE APP BREAKOUT ---
-      event.preventDefault(); // Stop the Atome3D app's internal navigator
-
-      if (isAndroid) {
-        // Triggers the Play Store App directly
-        // Using a general intent for Android to ensure it leaves the WebView
-        const playStoreUrl = "https://play.google.com/store/apps/details?id=com.tigertag.app";
-        window.location.href = `intent://${playStoreUrl.replace(/^https?:\/\//, '')}#Intent;scheme=https;action=android.intent.action.VIEW;end`;
-      } 
-      else if (isIOS) {
-        // itms-apps:// triggers the Apple App Store App directly
-        // Using the ID from your provided link: 6745437963
-        const appStoreAppUrl = "itms-apps://apps.apple.com/app/id6745437963";
-        const appStoreWebUrl = "https://apps.apple.com/fr/app/tigertag-rfid-connect/id6745437963";
-
-        // Try to open the Store App first
-        window.location.href = appStoreAppUrl;
+        if (isAndroid) {
+          event.preventDefault();
+          window.location.href = "https://play.google.com/store/apps/details?id=com.tigertag.connect&hl=fr";
+          return;
+        } 
         
-        // Fallback: If it doesn't redirect in 250ms, try the web URL in Safari
-        setTimeout(() => {
-          window.open(appStoreWebUrl, '_system');
-        }, 250);
+        if (isIOS) {
+          // Force the App Store App to open on iPhone/iPad
+          link.href = "itms-apps://apps.apple.com/fr/app/tigertag-rfid-connect/id6745437963";
+          return;
+        }
+
+        // --- 2. PC / DESKTOP SYSTEMS ---
+        // Detect if the PC is a Mac or Windows
+        const isMac = platform.includes('mac');
+        const isWindows = platform.includes('win');
+
+        if (isMac) {
+          // Redirect Mac users to the Apple App Store Web page
+          link.href = "https://apps.apple.com/fr/app/tigertag-rfid-connect/id6745437963";
+        } 
+        else if (isWindows) {
+          // Redirect Windows users to the Google Play Store Web page
+          link.href = "https://play.google.com/store/apps/details?id=com.tigertag.connect&hl=fr";
+        } 
+        else {
+          // Fallback for Linux or unknown PC systems
+          link.href = "https://tigertag.io/pages/apps"; 
+        }
       }
-    }
 
 
   
