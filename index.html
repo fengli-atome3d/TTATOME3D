@@ -308,24 +308,20 @@
 
       // --- MOBILE APP BREAKOUT ---
       if (isAndroid || isIOS) {
-        event.preventDefault();
+        event.preventDefault(); // Stop the app from trying to handle the click internally
         
         const storeUrl = isAndroid 
           ? "https://play.google.com/store/apps/details?id=com.tigertag.connect&hl=fr"
-          : "itms-apps://apps.apple.com/app/id6745437963"; // Use the 'itms-apps' protocol
+          : "https://apps.apple.com/fr/app/tigertag-rfid-connect/id6745437963";
 
-        // TRICK: Create a temporary hidden iframe to "force" the OS to see the link
-        const iframe = document.createElement('iframe');
-        iframe.style.display = 'none';
-        iframe.src = storeUrl;
-        document.body.appendChild(iframe);
+        // 1. Try to open via window.open with a blank target. 
+        // In many WebViews, this forces the OS to take over.
+        const newWindow = window.open(storeUrl, '_blank');
 
-        // Fallback: If the iframe doesn't trigger the store app in 500ms, force a system open
-        setTimeout(() => {
-          document.body.removeChild(iframe);
-          window.open(storeUrl, '_system'); // '_system' is the specific flag for app breakouts
-        }, 500);
-
+        // 2. If it's still stuck, try the "location change" as a backup
+        if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+          window.location.href = storeUrl;
+        }
         return;
       }
 
