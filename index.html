@@ -301,68 +301,42 @@
       }
     }
 
-    function handleDownload(event) {
-        const ua = navigator.userAgent.toLowerCase();
-        const platform = navigator.platform.toLowerCase();
-        const link = event.currentTarget;
-
-        // --- 1. MOBILE SYSTEMS ---
-        const isAndroid = /android/i.test(ua);
-        const isIOS = /ipad|iphone|ipod/.test(ua);
-
-        if (isAndroid) {
-          event.preventDefault();
-          window.location.href = "https://play.google.com/store/apps/details?id=com.tigertag.connect&hl=fr";
-          return;
-        } 
-        
-        if (isIOS) {
-          // Force the App Store App to open on iPhone/iPad
-          link.href = "https://apps.apple.com/fr/app/tigertag-rfid-connect/id6745437963";
-          return;
-        }
-
-        // --- 2. PC / DESKTOP SYSTEMS ---
-        // Detect if the PC is a Mac or Windows
-        const isMac = platform.includes('mac');
-        const isWindows = platform.includes('win');
-
-        if (isMac) {
-          // Redirect Mac users to the Apple App Store Web page
-          link.href = "https://apps.apple.com/fr/app/tigertag-rfid-connect/id6745437963";
-        } 
-        else if (isWindows) {
-          // Redirect Windows users to the Google Play Store Web page
-          link.href = "https://play.google.com/store/apps/details?id=com.tigertag.connect&hl=fr";
-        } 
-        else {
-          // Fallback for Linux or unknown PC systems
-          link.href = "https://apps.apple.com/fr/app/tigertag-rfid-connect/id6745437963"; 
-        }
-      }
+   
+  function handleDownload(event) {
+    const ua = navigator.userAgent.toLowerCase();
+    const platform = navigator.platform.toLowerCase();
+    const link = event.currentTarget;
 
 
-  
-    function openInExternalBrowser(event, url) {
-    const ua = navigator.userAgent || navigator.vendor || window.opera;
     const isAndroid = /android/i.test(ua);
-    const isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
-    if (!isAndroid && !isIOS) {
-      return; 
-    }
-    event.preventDefault();
+    const isIOS = /ipad|iphone|ipod/.test(ua);
 
     if (isAndroid) {
-      const intentUrl = `intent://${url.replace(/^https?:\/\//, '')}#Intent;scheme=https;action=android.intent.action.VIEW;end`;
-      window.location.href = intentUrl;
+
+      event.preventDefault();
+      window.location.href = "https://play.google.com/store/apps/details?id=com.tigertag.connect&hl=fr";
+      return;
     } 
-    else if (isIOS) {
-      const newWin = window.open(url, '_system');
-      if (!newWin || newWin.closed || typeof newWin.closed === 'undefined') {
-        window.location.href = url;
-      }
+
+    if (isIOS) {
+      link.href = "https://apps.apple.com/fr/app/tigertag-rfid-connect/id6745437963";
+      return;
+    }
+
+    const isMac = platform.includes('mac');
+    const isWindows = platform.includes('win');
+
+    if (isWindows) {
+      link.href = "https://play.google.com/store/apps/details?id=com.tigertag.connect&hl=fr";
+    } 
+    else if (isMac) {
+      link.href = "https://apps.apple.com/fr/app/tigertag-rfid-connect/id6745437963";
+    } 
+    else {
+      link.href = "https://tigertag.io/pages/apps";
     }
   }
+
 
   async function handleCloseAction() {
       if (document.fullscreenElement) {
