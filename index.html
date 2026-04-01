@@ -255,12 +255,12 @@
         <a
           class="button-link button-link--download"
           href="https://taap.it/DF1Aqt"
-          onclick="forceExternal(event, this.href)"
+          onclick="openInExternalBrowser(event, this.href)"
           target="_blank"
           rel="noopener noreferrer"
           aria-label="Telecharger Tigertag"
         >
-          Telecharger Tigertag
+          Télécharger Tigertag
         </a>
 
         <a
@@ -301,17 +301,35 @@
       }
     }
 
-    function forceExternal(event, url) {
-      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-      
-      if (isMobile) {
-        event.preventDefault();
-        window.open(url, '_system'); 
-        setTimeout(() => {
-          window.location.href = url;
-        }, 100);
+    function openInExternalBrowser(event, url) {
+        const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+        const isAndroid = /android/i.test(userAgent);
+        const isIOS = /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream;
+
+        // 1. Logic for Android
+        if (isAndroid) {
+          event.preventDefault();
+          // The 'intent://' scheme forces Android to open the URL in the actual Chrome App
+          const intentUrl = `intent://${url.replace(/^https?:\/\//, '')}#Intent;scheme=https;action=android.intent.action.VIEW;package=com.android.chrome;end`;
+          window.location.href = intentUrl;
+          return;
+        }
+
+        // 2. Logic for iOS (iPhone/iPad)
+        if (isIOS) {
+          // Standard window.open with '_system' often triggers the 'Open in Safari' prompt
+          // in most iOS App WebViews (like Facebook, Instagram, or custom apps)
+          const opened = window.open(url, '_system');
+          
+          if (!opened || opened.closed || typeof opened.closed === 'undefined') {
+            // Fallback: if _system is blocked, try a direct location change
+            window.location.href = url;
+          }
+          return;
+        }
+
+        // 3. Desktop or others: allow standard target="_blank" behavior
       }
-    }
 
     async function handleCloseAction() {
       if (document.fullscreenElement) {
