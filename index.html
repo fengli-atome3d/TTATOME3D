@@ -255,7 +255,7 @@
         <a
           class="button-link button-link--download"
           href="https://taap.it/DF1Aqt"
-          onclick="openInExternalBrowser(event, this.href)"
+          onclick="openInStore(event)"
           target="_blank"
           rel="noopener noreferrer"
           aria-label="Telecharger Tigertag"
@@ -301,7 +301,43 @@
       }
     }
 
-  function openInExternalBrowser(event, url) {
+  function openInStore(event) {
+      const ua = navigator.userAgent || navigator.vendor || window.opera;
+      const isAndroid = /android/i.test(ua);
+      const isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+
+      // --- 1. PC / DESKTOP LOGIC ---
+      if (!isAndroid && !isIOS) {
+        // Let the standard target="_blank" handle it on PC
+        return;
+      }
+
+      // --- 2. MOBILE APP BREAKOUT ---
+      event.preventDefault(); // Stop the app's internal navigator
+
+      if (isAndroid) {
+        // market:// triggers the Play Store App directly
+        // replace 'com.tigertag.app' with the actual Package ID of Tigertag
+        window.location.href = "market://details?id=com.tigertag.app"; 
+        
+        // Fallback if market:// fails (opens Chrome)
+        setTimeout(() => {
+          window.location.href = "https://play.google.com/store/apps/details?id=com.tigertag.app";
+        }, 250);
+      } 
+      else if (isIOS) {
+        // itms-apps:// triggers the Apple App Store App directly
+        // replace '123456789' with the actual Apple ID of Tigertag
+        window.location.href = "itms-apps://itunes.apple.com/app/id123456789";
+        
+        // Fallback if itms-apps fails (opens Safari)
+        setTimeout(() => {
+          window.location.href = "https://apps.apple.com/app/id123456789";
+        }, 250);
+      }
+    }
+  
+    function openInExternalBrowser(event, url) {
     const ua = navigator.userAgent || navigator.vendor || window.opera;
     const isAndroid = /android/i.test(ua);
     const isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
